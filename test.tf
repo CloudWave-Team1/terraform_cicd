@@ -222,22 +222,22 @@ resource "aws_route_table" "private_b" {
 }
 
 # 프라이빗 서브넷에 라우팅 테이블 연결
-resource "aws_route_table_association" "private_a" {
+resource "aws_route_table_association" "private_a01" {
   subnet_id      = aws_subnet.TFC_PRD_sub[0].id
   route_table_id = aws_route_table.private_a.id
 }
 
-resource "aws_route_table_association" "private_b" {
+resource "aws_route_table_association" "private_b01" {
   subnet_id      = aws_subnet.TFC_PRD_sub[1].id
   route_table_id = aws_route_table.private_b.id
 }
 
-resource "aws_route_table_association" "private_a" {
+resource "aws_route_table_association" "private_a02" {
   subnet_id      = aws_subnet.TFC_PRD_sub[2].id
   route_table_id = aws_route_table.private_a.id
 }
 
-resource "aws_route_table_association" "private_b" {
+resource "aws_route_table_association" "private_b02" {
   subnet_id      = aws_subnet.TFC_PRD_sub[3].id
   route_table_id = aws_route_table.private_b.id
 }
