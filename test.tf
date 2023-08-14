@@ -1,8 +1,11 @@
 # VPC 생성
 # test
 
+# AWS 프로바이더 설정
 provider "aws" {
-  region = "ap-northeast-2"
+  region  = "ap-northeast-2"
+  access_key = var.AWS_ACCESS_KEY_ID
+  secret_key = var.AWS_SECRET_ACCESS_KEY
 }
 
 resource "aws_vpc" "TFC_PRD_VPC" {
@@ -17,7 +20,7 @@ resource "aws_vpc" "TFC_PRD_VPC" {
 resource "aws_subnet" "TFC_PRD_sub" {
   count = 6
 
-  availability_zone = count.index < 2 ? ["ap-northeast-2a", "ap-northeast-2c"][count.index] : null
+  availability_zone = count.index < 6 ? ["ap-northeast-2a", "ap-northeast-2c"][count.index] : null
   cidr_block        = [
     "10.3.1.0/24",
     "10.3.2.0/24",
@@ -42,10 +45,14 @@ resource "aws_internet_gateway" "TFC_PRD_IG" {
   }
 }
 
+resource "aws_eip" "example" {
+  count = 2
+}
+
 # NAT Gateway 생성
 resource "aws_nat_gateway" "TFC_PRD_NG" {
   count         = 2
-  allocation_id = "eipalloc-015739ec245018702"
+  allocation_id = aws_eip.example[count.index].id
   subnet_id     = aws_subnet.TFC_PRD_sub[count.index].id
 
   tags = {
@@ -68,8 +75,8 @@ resource "aws_autoscaling_group" "TFC_PRD_ASGP" {
   max_size           = 2
   min_size           = 1
   vpc_zone_identifier = [
-    aws_subnet.TFC_PRD_sub[2].id, 
-    aws_subnet.TFC_PRD_sub[3].id
+    aws_subnet.TFC_PRD_sub[0].id, 
+    aws_subnet.TFC_PRD_sub[1].id
   ]
 
   launch_template {
