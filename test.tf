@@ -1,6 +1,16 @@
 # VPC 생성
 # test
 
+variable "AWS_ACCESS_KEY_ID" {
+  description = "AWS Access Key"
+  type        = string
+}
+
+variable "AWS_SECRET_ACCESS_KEY" {
+  description = "AWS Secret Key"
+  type        = string
+}
+
 # AWS 프로바이더 설정
 provider "aws" {
   region  = "ap-northeast-2"
