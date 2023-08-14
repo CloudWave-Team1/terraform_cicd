@@ -248,7 +248,8 @@ resource "aws_route_table" "public_a" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.TFC_PRD_NG[0].id
+    # nat_gateway_id = aws_nat_gateway.TFC_PRD_NG[0].id
+    gateway_id = aws_internet_gateway.TFC_PRD_IG.id
   }
 
   tags = {
@@ -260,7 +261,8 @@ resource "aws_route_table" "public_b" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.TFC_PRD_NG[1].id
+    # nat_gateway_id = aws_nat_gateway.TFC_PRD_NG[1].id
+    gateway_id = aws_internet_gateway.TFC_PRD_IG.id
   }
 
   tags = {
