@@ -10,20 +10,30 @@ resource "aws_vpc" "TFC_PRD_VPC" {
   }
 }
 
+# Internet Gateway 생성
+resource "aws_internet_gateway" "TFC_PRD_IGW" {
+  vpc_id = aws_vpc.TFC_PRD_VPC.id
+}
+
+# VPC에 Internet Gateway 연결
+resource "aws_vpc_dhcp_options" "TFC_PRD_DHCP" {
+  domain_name = "service.consul"
+  domain_name_servers = ["AmazonProvidedDNS"]
+}
+
+resource "aws_vpc_dhcp_options_association" "TFC_PRD_DHCP_ASSOC" {
+  vpc_id = aws_vpc.TFC_PRD_VPC.id
+  dhcp_options_id = aws_vpc_dhcp_options.TFC_PRD_DHCP.id
+}
+
 # 6개의 서브넷 생성 설정
 resource "aws_subnet" "TFC_PRD_sub" {
   count = 6
 
   availability_zone = ["ap-northeast-2a", "ap-northeast-2c"][count.index % 2]
-  cidr_block        = [
-    "10.3.1.0/24",
-    "10.3.2.0/24",
-    "10.3.11.0/24",
-    "10.3.12.0/24",
-    "10.3.13.0/24",
-    "10.3.14.0/24"
-  ][count.index]
-  vpc_id = aws_vpc.TFC_PRD_VPC.id
+  cidr_block        = ["10.3.1.0/24", "10.3.2.0/24", "10.3.11.0/24", "10.3.12.0/24", "10.3.13.0/24", "10.3.14.0/24"][count.index]
+  vpc_id            = aws_vpc.TFC_PRD_VPC.id
+
   tags = {
     Name = ["TFC-PRD-sub-pub-01", "TFC-PRD-sub-pub-02", "TFC-PRD-sub-pri-01", "TFC-PRD-sub-pri-02", "TFC-PRD-sub-pri-03", "TFC-PRD-sub-pri-04"][count.index]
   }
@@ -38,29 +48,6 @@ resource "aws_nat_gateway" "TFC_PRD_NG" {
   count         = 2
   subnet_id     = aws_subnet.TFC_PRD_sub[count.index].id
   allocation_id = aws_eip.NAT_EIP[count.index].id
-}
-
-# Security Groups 생성
-resource "aws_security_group" "TFC_PRD_ELB_SG" {
-  vpc_id = aws_vpc.TFC_PRD_VPC.id
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/24"]
-  }
-
-  tags = {
-    Name = "TFC-PRD-ELB-SG"
-  }
 }
 
 resource "aws_security_group" "TFC_PRD_EC2_SG" {
