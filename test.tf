@@ -169,35 +169,32 @@ resource "aws_autoscaling_policy" "simple_scale" {
   name                   = "TFC-PRD-ASGP-TTP"
   scaling_adjustment     = 1
   adjustment_type        = "ChangeInCapacity"
+  autoscaling_group_name = aws_autoscaling_group.TFC_PRD_ASGP.name   # 이 줄 추가
 }
 
 # Private Route Table 생성 및 연결
 resource "aws_route_table" "TFC_PRD_private_rt" {
+  count  = 2
   vpc_id = aws_vpc.TFC_PRD_VPC.id
 
   tags = {
-    Name = "TFC-PRD-Private-RT"
+    Name = "TFC-PRD-Private-RT-${count.index + 1}"
   }
 }
 
-resource "aws_route" "private_nat_route_1" {
-  route_table_id         = aws_route_table.TFC_PRD_private_rt.id
+resource "aws_route" "private_nat_route" {
+  count                  = 2
+  route_table_id         = aws_route_table.TFC_PRD_private_rt[count.index].id
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.TFC_PRD_NG[0].id
-}
-
-resource "aws_route" "private_nat_route_2" {
-  route_table_id         = aws_route_table.TFC_PRD_private_rt.id
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.TFC_PRD_NG[1].id
+  nat_gateway_id         = aws_nat_gateway.TFC_PRD_NG[count.index].id
 }
 
 resource "aws_route_table_association" "private_a" {
   subnet_id      = aws_subnet.TFC_PRD_sub[2].id  # TFC-PRD-sub-pri-01
-  route_table_id = aws_route_table.TFC_PRD_private_rt.id
+  route_table_id = aws_route_table.TFC_PRD_private_rt[0].id
 }
 
 resource "aws_route_table_association" "private_c" {
   subnet_id      = aws_subnet.TFC_PRD_sub[3].id  # TFC-PRD-sub-pri-02
-  route_table_id = aws_route_table.TFC_PRD_private_rt.id
+  route_table_id = aws_route_table.TFC_PRD_private_rt[1].id
 }
