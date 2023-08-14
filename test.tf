@@ -187,7 +187,6 @@ resource "aws_autoscaling_policy" "TFC_PRD_ASGP_TTP" {
     }
 
     target_value       = 50.0
-    instance_warm_up   = 300
   }
 }
 
