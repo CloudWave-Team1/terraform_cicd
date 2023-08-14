@@ -64,7 +64,7 @@ resource "aws_launch_template" "TFC_EC2_template" {
   image_id      = "ami-055179a7fc9fb032d"
   instance_type = "t2.micro"
   name_prefix   = "TFC-EC2-template"
-  user_data = file("./userdata.sh")
+  user_data = file("./userdata.sh") # TEST
 
   vpc_security_group_ids = [aws_security_group.TFC_PRD_EC2_SG.id]
 }
