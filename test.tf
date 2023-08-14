@@ -72,6 +72,9 @@ resource "aws_launch_template" "TFC_EC2_template" {
   image_id      = "ami-055179a7fc9fb032d"
   instance_type = "t2.micro"
   name_prefix   = "TFC-EC2-template"
+
+  # 여기에 보안 그룹 지정
+  vpc_security_group_ids = [aws_security_group.TFC_PRD_EC2_SG.id]
 }
 
 # EC2 보안 그룹 생성
@@ -111,9 +114,6 @@ resource "aws_autoscaling_group" "TFC_PRD_ASGP" {
     aws_subnet.TFC_PRD_sub[3].id   # TFC-PRD-sub-pri-02
   ]
 
-  # EC2 인스턴스 생성 시 사용할 보안그룹 지정
-  vpc_security_group_ids = [aws_security_group.TFC_PRD_EC2_SG.id]
-  
   launch_template {
     id      = aws_launch_template.TFC_EC2_template.id
     version = "$Latest"
