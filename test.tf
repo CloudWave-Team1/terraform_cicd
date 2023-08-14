@@ -30,7 +30,7 @@ resource "aws_vpc" "TFC_PRD_VPC" {
 resource "aws_subnet" "TFC_PRD_sub" {
   count = 6
 
-  availability_zone = count.index < 6 ? ["ap-northeast-2a", "ap-northeast-2c"][count.index] : null
+  availability_zone = ["ap-northeast-2a", "ap-northeast-2c"][count.index % 2]
   cidr_block        = [
     "10.3.1.0/24",
     "10.3.2.0/24",
