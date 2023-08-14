@@ -72,9 +72,8 @@ resource "aws_launch_template" "TFC_EC2_template" {
   image_id      = "ami-055179a7fc9fb032d"
   instance_type = "t2.micro"
   name_prefix   = "TFC-EC2-template"
-  user_data = base64encode(file("./test.sh")) # 테스트용
+  user_data = base64encode(file("./test.sh"))
 
-  # 여기에 보안 그룹 지정
   vpc_security_group_ids = [aws_security_group.TFC_PRD_EC2_SG.id]
 }
 
@@ -82,7 +81,6 @@ resource "aws_launch_template" "TFC_EC2_template" {
 resource "aws_security_group" "TFC_PRD_EC2_SG" {
   vpc_id = aws_vpc.TFC_PRD_VPC.id
   
-  # VPC 내부 트래픽만 허용
   ingress {
     from_port   = 0
     to_port     = 65535
@@ -90,7 +88,6 @@ resource "aws_security_group" "TFC_PRD_EC2_SG" {
     cidr_blocks = [aws_vpc.TFC_PRD_VPC.cidr_block]
   }
   
-  # 모든 외부로 나가는 트래픽 허용
   egress {
     from_port   = 0
     to_port     = 65535
@@ -103,47 +100,25 @@ resource "aws_security_group" "TFC_PRD_EC2_SG" {
   }
 }
 
-# EC2 자동 확장 그룹 설정
-resource "aws_autoscaling_group" "TFC_PRD_ASGP" {
-  desired_capacity   = 1
-  max_size           = 2
-  min_size           = 1
-  
-  # 특정 서브넷들에 대해 인스턴스 생성
-  vpc_zone_identifier = [
-    aws_subnet.TFC_PRD_sub[2].id,  # TFC-PRD-sub-pri-01
-    aws_subnet.TFC_PRD_sub[3].id   # TFC-PRD-sub-pri-02
-  ]
+# Target Group 생성
+resource "aws_lb_target_group" "TFC_PRD_TG" {
+  name     = "TFC-PRD-TG"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.TFC_PRD_VPC.id
 
-  launch_template {
-    id      = aws_launch_template.TFC_EC2_template.id
-    version = "$Latest"
+  health_check {
+    enabled             = true
+    interval            = 30
+    path                = "/"
+    port                = "80"
+    timeout             = 5
+    healthy_threshold   = 3
+    unhealthy_threshold = 3
   }
 
-  tag {
-    key                 = "Name"
-    propagate_at_launch = true
-    value               = "TFC-PRD-ASGP"
-  }
-}
-
-# Application Load Balancer 보안 그룹 생성
-resource "aws_security_group" "TFC_PRD_ELB_SG" {
-  vpc_id = aws_vpc.TFC_PRD_VPC.id
-  egress {
-    cidr_blocks = ["0.0.0.0/0"]
-    from_port   = 0
-    protocol    = "-1"
-    to_port     = 0
-  }
-  ingress {
-    cidr_blocks = ["0.0.0.0/24"]
-    from_port   = 80
-    protocol    = "tcp"
-    to_port     = 80
-  }
   tags = {
-    Name = "TFC-PRD-ELB-SG"
+    Name = "TFC-PRD-TG"
   }
 }
 
@@ -153,25 +128,88 @@ resource "aws_lb" "TFC_PRD_ELB" {
   load_balancer_type = "application"
   name               = "TFC-PRD-ELB"
   security_groups    = [aws_security_group.TFC_PRD_ELB_SG.id]
-  subnets            = [aws_subnet.TFC_PRD_sub[0].id, aws_subnet.TFC_PRD_sub[1].id] # 공개 서브넷
+  subnets            = [aws_subnet.TFC_PRD_sub[0].id, aws_subnet.TFC_PRD_sub[1].id]
   enable_deletion_protection = false
   tags = {
     Name = "TFC-PRD-ELB"
   }
 }
 
-# Application Load Balancer 리스너 설정
+# ALB 리스너에서 대상 그룹을 default action으로 설정
 resource "aws_lb_listener" "front_end" {
   load_balancer_arn = aws_lb.TFC_PRD_ELB.arn
   port              = "80"
   protocol          = "HTTP"
 
   default_action {
-    type = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      message_body = "Fixed response content"
-      status_code  = "200"
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.TFC_PRD_TG.arn
+  }
+}
+
+# EC2 자동 확장 그룹 설정
+resource "aws_autoscaling_group" "TFC_PRD_ASGP" {
+  desired_capacity   = 1
+  max_size           = 2
+  min_size           = 1
+  
+  vpc_zone_identifier = [
+    aws_subnet.TFC_PRD_sub[2].id,
+    aws_subnet.TFC_PRD_sub[3].id
+  ]
+
+  launch_template {
+    id      = aws_launch_template.TFC_EC2_template.id
+    version = "$Latest"
+  }
+
+  target_group_arns = [aws_lb_target_group.TFC_PRD_TG.arn]
+
+  health_check_type         = "ELB"
+  health_check_grace_period = 300
+
+  tag {
+    key                 = "Name"
+    propagate_at_launch = true
+    value               = "TFC-PRD-ASGP"
+  }
+}
+
+# Target Tracking Scaling Policy
+resource "aws_autoscaling_policy" "TFC_PRD_ASGP_TTP" {
+  name                   = "TFC-PRD-ASGP-TTP"
+  policy_type            = "TargetTrackingScaling"
+  autoscaling_group_name = aws_autoscaling_group.TFC_PRD_ASGP.name
+
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ASGAverageCPUUtilization"
     }
+
+    target_value       = 50.0
+    instance_warm_up   = 300
+  }
+}
+
+# Application Load Balancer 보안 그룹 생성
+resource "aws_security_group" "TFC_PRD_ELB_SG" {
+  vpc_id = aws_vpc.TFC_PRD_VPC.id
+  
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "TFC-PRD-ELB-SG"
   }
 }
