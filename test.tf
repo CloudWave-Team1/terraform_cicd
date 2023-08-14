@@ -242,3 +242,34 @@ resource "aws_route_table_association" "public_b" {
   subnet_id      = aws_subnet.TFC_PRD_sub[1].id
   route_table_id = aws_route_table.public.id
 }
+
+# 인터넷 게이트웨이 생성
+resource "aws_internet_gateway" "TFC_PRD_IG" {
+  vpc_id = aws_vpc.TFC_PRD_VPC.id
+  tags = {
+    Name = "TFC-PRD-IG"
+  }
+}
+
+# VPC에 라우팅 테이블을 생성하고 인터넷 게이트웨이로 라우팅
+resource "aws_route_table" "TFC_PRD_RT" {
+  vpc_id = aws_vpc.TFC_PRD_VPC.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.TFC_PRD_IG.id
+  }
+  tags = {
+    Name = "TFC-PRD-RT"
+  }
+}
+
+# 공개 서브넷에 라우팅 테이블 연결
+resource "aws_route_table_association" "TFC_PRD_A" {
+  subnet_id      = aws_subnet.TFC_PRD_sub[0].id
+  route_table_id = aws_route_table.TFC_PRD_RT.id
+}
+
+resource "aws_route_table_association" "TFC_PRD_B" {
+  subnet_id      = aws_subnet.TFC_PRD_sub[1].id
+  route_table_id = aws_route_table.TFC_PRD_RT.id
+}
