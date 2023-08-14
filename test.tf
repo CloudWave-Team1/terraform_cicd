@@ -155,13 +155,11 @@ resource "aws_autoscaling_group" "TFC_PRD_ASGP" {
   vpc_zone_identifier  = [aws_subnet.TFC_PRD_sub[2].id, aws_subnet.TFC_PRD_sub[3].id]
   target_group_arns    = [aws_lb_target_group.TFC_PRD_TG.arn]
 
-  tags = [
-    {
-      key                 = "Name"
-      value               = "TFC-ASG-Instance"
-      propagate_at_launch = true
-    }
-  ]
+  tag {
+    key                 = "Name"
+    value               = "TFC-ASG-Instance"
+    propagate_at_launch = true
+  }
 }
 
 # Scaling Policy
