@@ -225,7 +225,7 @@ resource "aws_route_table" "public" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.TFC_PRD_NG[0].id
+    nat_gateway_id = aws_internet_gateway.TFC_PRD_IG.id
   }
 
   tags = {
@@ -249,17 +249,5 @@ resource "aws_internet_gateway" "TFC_PRD_IG" {
   vpc_id = aws_vpc.TFC_PRD_VPC.id
   tags = {
     Name = "TFC-PRD-IG"
-  }
-}
-
-# VPC에 라우팅 테이블을 생성하고 인터넷 게이트웨이로 라우팅
-resource "aws_route_table" "TFC_PRD_RT" {
-  vpc_id = aws_vpc.TFC_PRD_VPC.id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.TFC_PRD_IG.id
-  }
-  tags = {
-    Name = "TFC-PRD-RT"
   }
 }
