@@ -167,7 +167,6 @@ resource "aws_autoscaling_policy" "TFC_PRD_ASGP_TTP" {
   name                   = "TFC-PRD-ASGP-TTP"
   autoscaling_group_name = aws_autoscaling_group.TFC_PRD_ASGP.name
   policy_type            = "TargetTrackingScaling"
-  estimated_warmup       = 300
 
   target_tracking_configuration {
     predefined_metric_specification {
