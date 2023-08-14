@@ -196,7 +196,7 @@ resource "aws_security_group" "TFC_PRD_ELB_SG" {
 }
 
 # Private Subnet의 라우팅 테이블 생성
-resource "aws_route_table" "private" {
+resource "aws_route_table" "private_a" {
   vpc_id = aws_vpc.TFC_PRD_VPC.id
 
   route {
@@ -205,54 +205,78 @@ resource "aws_route_table" "private" {
   }
 
   tags = {
-    Name = "TFC-PRD-Private-RT"
+    Name = "TFC-PRD-Private-RT01"
   }
 }
-
-# 프라이빗 서브넷에 라우팅 테이블 연결
-resource "aws_route_table_association" "private_1" {
-  subnet_id      = aws_subnet.TFC_PRD_sub[0].id
-  route_table_id = aws_route_table.private.id
-}
-
-resource "aws_route_table_association" "private_2" {
-  subnet_id      = aws_subnet.TFC_PRD_sub[1].id
-  route_table_id = aws_route_table.private.id
-}
-
-resource "aws_route_table_association" "private_3" {
-  subnet_id      = aws_subnet.TFC_PRD_sub[2].id
-  route_table_id = aws_route_table.private.id
-}
-
-resource "aws_route_table_association" "private_4" {
-  subnet_id      = aws_subnet.TFC_PRD_sub[3].id
-  route_table_id = aws_route_table.private.id
-}
-
-# Public Subnet의 라우팅 테이블 생성
-resource "aws_route_table" "public" {
+resource "aws_route_table" "private_b" {
   vpc_id = aws_vpc.TFC_PRD_VPC.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    nat_gateway_id = aws_internet_gateway.TFC_PRD_IG.id
+    nat_gateway_id = aws_nat_gateway.TFC_PRD_NG[1].id
   }
 
   tags = {
-    Name = "TFC-PRD-Public-RT"
+    Name = "TFC-PRD-Private-RT02"
+  }
+}
+
+# 프라이빗 서브넷에 라우팅 테이블 연결
+resource "aws_route_table_association" "private_a" {
+  subnet_id      = aws_subnet.TFC_PRD_sub[0].id
+  route_table_id = aws_route_table.private_a.id
+}
+
+resource "aws_route_table_association" "private_b" {
+  subnet_id      = aws_subnet.TFC_PRD_sub[1].id
+  route_table_id = aws_route_table.private_b.id
+}
+
+resource "aws_route_table_association" "private_a" {
+  subnet_id      = aws_subnet.TFC_PRD_sub[2].id
+  route_table_id = aws_route_table.private_a.id
+}
+
+resource "aws_route_table_association" "private_b" {
+  subnet_id      = aws_subnet.TFC_PRD_sub[3].id
+  route_table_id = aws_route_table.private_b.id
+}
+
+# Public Subnet의 라우팅 테이블 생성
+resource "aws_route_table" "public_a" {
+  vpc_id = aws_vpc.TFC_PRD_VPC.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.TFC_PRD_NG[0].id
+  }
+
+  tags = {
+    Name = "TFC-PRD-Public-RT01"
+  }
+}
+resource "aws_route_table" "public_b" {
+  vpc_id = aws_vpc.TFC_PRD_VPC.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.TFC_PRD_NG[1].id
+  }
+
+  tags = {
+    Name = "TFC-PRD-Public-RT02"
   }
 }
 
 # 퍼블릿 서브넷에 라우팅 테이블 연결
-resource "aws_route_table_association" "public_1" {
+resource "aws_route_table_association" "public_a" {
   subnet_id      = aws_subnet.TFC_PRD_sub[0].id
-  route_table_id = aws_route_table.public.id
+  route_table_id = aws_route_table.public_a.id
 }
 
-resource "aws_route_table_association" "public_2" {
+resource "aws_route_table_association" "public_b" {
   subnet_id      = aws_subnet.TFC_PRD_sub[1].id
-  route_table_id = aws_route_table.public.id
+  route_table_id = aws_route_table.public_b.id
 }
 
 # 인터넷 게이트웨이 생성
