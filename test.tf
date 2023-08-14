@@ -150,13 +150,12 @@ resource "aws_autoscaling_group" "TFC_PRD_ASG" {
     id      = aws_launch_template.TFC_EC2_template.id
     version = "$Latest"
   }
-  tags = [
-    {
-      key                 = "Name"
-      value               = "TFC-PRD-EC2"
-      propagate_at_launch = true
-    }
-  ]
+
+  tag {
+    key                 = "Name"
+    value               = "TFC-PRD-EC2"
+    propagate_at_launch = true
+  }
 }
 
 # Target Tracking Scaling Policy
