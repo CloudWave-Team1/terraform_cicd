@@ -161,11 +161,11 @@ resource "aws_autoscaling_group" "TFC_PRD_ASG" {
   
   target_group_arns    = [aws_lb_target_group.TFC_PRD_TG.arn]
 
-  tags = [{
+  tag {
     key                 = "Name"
     value               = "TFC-PRD-ASG"
     propagate_at_launch = true
-  }]
+  }
 }
 
 # ALB 보안 그룹 생성
