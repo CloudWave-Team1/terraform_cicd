@@ -148,27 +148,49 @@ resource "aws_lb_listener" "front_end" {
 }
 
 # EC2 자동 확장 그룹 설정
-resource "aws_autoscaling_group" "TFC_PRD_ASG" {
+resource "aws_autoscaling_group" "TFC_PRD_ASGP" {
+  desired_capacity   = 1
+  max_size           = 2
+  min_size           = 1
+  
+  vpc_zone_identifier = [
+    aws_subnet.TFC_PRD_sub[2].id,
+    aws_subnet.TFC_PRD_sub[3].id
+  ]
+
   launch_template {
     id      = aws_launch_template.TFC_EC2_template.id
     version = "$Latest"
   }
 
-  min_size             = 2
-  max_size             = 10
-  desired_capacity     = 4
-  vpc_zone_identifier  = [aws_subnet.TFC_PRD_sub[2].id, aws_subnet.TFC_PRD_sub[3].id, aws_subnet.TFC_PRD_sub[4].id, aws_subnet.TFC_PRD_sub[5].id]
-  
-  target_group_arns    = [aws_lb_target_group.TFC_PRD_TG.arn]
+  target_group_arns = [aws_lb_target_group.TFC_PRD_TG.arn]
+
+  health_check_type         = "ELB"
+  health_check_grace_period = 300
 
   tag {
     key                 = "Name"
-    value               = "TFC-PRD-ASG"
     propagate_at_launch = true
+    value               = "TFC-PRD-ASGP"
   }
 }
 
-# ALB 보안 그룹 생성
+# Target Tracking Scaling Policy
+resource "aws_autoscaling_policy" "TFC_PRD_ASGP_TTP" {
+  name                   = "TFC-PRD-ASGP-TTP"
+  policy_type            = "TargetTrackingScaling"
+  autoscaling_group_name = aws_autoscaling_group.TFC_PRD_ASGP.name
+
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ASGAverageCPUUtilization"
+    }
+
+    target_value       = 50.0
+  }
+}
+
+# Application Load Balancer 보안 그룹 생성
 resource "aws_security_group" "TFC_PRD_ELB_SG" {
   vpc_id = aws_vpc.TFC_PRD_VPC.id
   
@@ -178,63 +200,15 @@ resource "aws_security_group" "TFC_PRD_ELB_SG" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
   egress {
     from_port   = 0
     to_port     = 65535
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  
+
   tags = {
     Name = "TFC-PRD-ELB-SG"
   }
-}
-
-# 공개 서브넷 라우트 테이블 생성 및 연결
-resource "aws_route_table" "public_route_table" {
-  vpc_id = aws_vpc.TFC_PRD_VPC.id
-}
-
-resource "aws_route" "public_route" {
-  route_table_id         = aws_route_table.public_route_table.id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.TFC_PRD_IG.id
-}
-
-resource "aws_route_table_association" "public_a" {
-  subnet_id      = aws_subnet.TFC_PRD_sub[0].id
-  route_table_id = aws_route_table.public_route_table.id
-}
-
-resource "aws_route_table_association" "public_b" {
-  subnet_id      = aws_subnet.TFC_PRD_sub[1].id
-  route_table_id = aws_route_table.public_route_table.id
-}
-
-# 프라이빗 서브넷 라우트 테이블 생성 및 연결
-resource "aws_route_table" "private_route_table" {
-  vpc_id = aws_vpc.TFC_PRD_VPC.id
-}
-
-resource "aws_route" "private_route_a" {
-  route_table_id         = aws_route_table.private_route_table.id
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.TFC_PRD_NG[0].id
-}
-
-resource "aws_route" "private_route_b" {
-  route_table_id         = aws_route_table.private_route_table.id
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.TFC_PRD_NG[1].id
-}
-
-resource "aws_route_table_association" "private_a" {
-  subnet_id      = aws_subnet.TFC_PRD_sub[2].id
-  route_table_id = aws_route_table.private_route_table.id
-}
-
-resource "aws_route_table_association" "private_b" {
-  subnet_id      = aws_subnet.TFC_PRD_sub[3].id
-  route_table_id = aws_route_table.private_route_table.id
 }
