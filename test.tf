@@ -24,7 +24,7 @@ resource "aws_vpc" "TFC_PRD_VPC" {
   }
 }
 
-# 여러 서브넷 생성. 여기서는 6개의 서브넷을 생성하도록 설정.
+# 6개의 서브넷 생성 설정
 resource "aws_subnet" "TFC_PRD_sub" {
   count = 6
 
@@ -56,7 +56,7 @@ resource "aws_eip" "example" {
   count = 2
 }
 
-# NAT 게이트웨이 생성. 공개 서브넷에 위치.
+# NAT 게이트웨이 생성
 resource "aws_nat_gateway" "TFC_PRD_NG" {
   count         = 2
   allocation_id = aws_eip.example[count.index].id
@@ -77,38 +77,48 @@ resource "aws_launch_template" "TFC_EC2_template" {
 # EC2 보안 그룹 생성
 resource "aws_security_group" "TFC_PRD_EC2_SG" {
   vpc_id = aws_vpc.TFC_PRD_VPC.id
-  # 내부 트래픽 허용
+  
+  # VPC 내부 트래픽만 허용
   ingress {
     from_port   = 0
     to_port     = 65535
     protocol    = "tcp"
-    cidr_blocks = ["10.3.0.0/16"]
+    cidr_blocks = [aws_vpc.TFC_PRD_VPC.cidr_block]
   }
-  # 외부로 나가는 트래픽 허용
+  
+  # 모든 외부로 나가는 트래픽 허용
   egress {
     from_port   = 0
     to_port     = 65535
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  
   tags = {
     Name = "TFC-PRD-EC2-SG"
   }
 }
 
-# EC2 인스턴스를 자동으로 확장하거나 축소하는 그룹 생성
+# EC2 자동 확장 그룹 설정
 resource "aws_autoscaling_group" "TFC_PRD_ASGP" {
   desired_capacity   = 1
   max_size           = 2
   min_size           = 1
+  
+  # 특정 서브넷들에 대해 인스턴스 생성
   vpc_zone_identifier = [
     aws_subnet.TFC_PRD_sub[2].id,  # TFC-PRD-sub-pri-01
     aws_subnet.TFC_PRD_sub[3].id   # TFC-PRD-sub-pri-02
   ]
+
+  # EC2 인스턴스 생성 시 사용할 보안그룹 지정
+  vpc_security_group_ids = [aws_security_group.TFC_PRD_EC2_SG.id]
+  
   launch_template {
     id      = aws_launch_template.TFC_EC2_template.id
     version = "$Latest"
   }
+
   tag {
     key                 = "Name"
     propagate_at_launch = true
@@ -116,7 +126,7 @@ resource "aws_autoscaling_group" "TFC_PRD_ASGP" {
   }
 }
 
-# Application Load Balancer와 관련된 보안 그룹 생성
+# Application Load Balancer 보안 그룹 생성
 resource "aws_security_group" "TFC_PRD_ELB_SG" {
   vpc_id = aws_vpc.TFC_PRD_VPC.id
   egress {
@@ -142,59 +152,25 @@ resource "aws_lb" "TFC_PRD_ELB" {
   load_balancer_type = "application"
   name               = "TFC-PRD-ELB"
   security_groups    = [aws_security_group.TFC_PRD_ELB_SG.id]
-  subnets            = [aws_subnet.TFC_PRD_sub[0].id, aws_subnet.TFC_PRD_sub[1].id]
+  subnets            = [aws_subnet.TFC_PRD_sub[0].id, aws_subnet.TFC_PRD_sub[1].id] # 공개 서브넷
+  enable_deletion_protection = false
+  tags = {
+    Name = "TFC-PRD-ELB"
+  }
 }
 
-# Application Load Balancer의 타깃 그룹 생성
-resource "aws_lb_target_group" "TFC_PRD_ELB_GP" {
-  name     = "TFC-PRD-ELB-GP"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.TFC_PRD_VPC.id
-}
-
-# Application Load Balancer 리스너 생성
+# Application Load Balancer 리스너 설정
 resource "aws_lb_listener" "front_end" {
   load_balancer_arn = aws_lb.TFC_PRD_ELB.arn
   port              = "80"
   protocol          = "HTTP"
+
   default_action {
-    target_group_arn = aws_lb_target_group.TFC_PRD_ELB_GP.arn
-    type             = "forward"
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Fixed response content"
+      status_code  = "200"
+    }
   }
-}
-
-# 간단한 스케일링 정책 생성
-resource "aws_autoscaling_policy" "simple_scale" {
-  name                   = "TFC-PRD-ASGP-TTP"
-  scaling_adjustment     = 1
-  adjustment_type        = "ChangeInCapacity"
-  autoscaling_group_name = aws_autoscaling_group.TFC_PRD_ASGP.name   # 이 줄 추가
-}
-
-# Private Route Table 생성 및 연결
-resource "aws_route_table" "TFC_PRD_private_rt" {
-  count  = 2
-  vpc_id = aws_vpc.TFC_PRD_VPC.id
-
-  tags = {
-    Name = "TFC-PRD-Private-RT-${count.index + 1}"
-  }
-}
-
-resource "aws_route" "private_nat_route" {
-  count                  = 2
-  route_table_id         = aws_route_table.TFC_PRD_private_rt[count.index].id
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.TFC_PRD_NG[count.index].id
-}
-
-resource "aws_route_table_association" "private_a" {
-  subnet_id      = aws_subnet.TFC_PRD_sub[2].id  # TFC-PRD-sub-pri-01
-  route_table_id = aws_route_table.TFC_PRD_private_rt[0].id
-}
-
-resource "aws_route_table_association" "private_c" {
-  subnet_id      = aws_subnet.TFC_PRD_sub[3].id  # TFC-PRD-sub-pri-02
-  route_table_id = aws_route_table.TFC_PRD_private_rt[1].id
 }
