@@ -209,12 +209,23 @@ resource "aws_route_table" "private" {
   }
 }
 
-resource "aws_route_table_association" "private_a" {
+# 프라이빗 서브넷에 라우팅 테이블 연결
+resource "aws_route_table_association" "private_1" {
+  subnet_id      = aws_subnet.TFC_PRD_sub[0].id
+  route_table_id = aws_route_table.private.id
+}
+
+resource "aws_route_table_association" "private_2" {
+  subnet_id      = aws_subnet.TFC_PRD_sub[1].id
+  route_table_id = aws_route_table.private.id
+}
+
+resource "aws_route_table_association" "private_3" {
   subnet_id      = aws_subnet.TFC_PRD_sub[2].id
   route_table_id = aws_route_table.private.id
 }
 
-resource "aws_route_table_association" "private_b" {
+resource "aws_route_table_association" "private_4" {
   subnet_id      = aws_subnet.TFC_PRD_sub[3].id
   route_table_id = aws_route_table.private.id
 }
@@ -234,12 +245,12 @@ resource "aws_route_table" "public" {
 }
 
 # 퍼블릿 서브넷에 라우팅 테이블 연결
-resource "aws_route_table_association" "public_a" {
+resource "aws_route_table_association" "public_1" {
   subnet_id      = aws_subnet.TFC_PRD_sub[0].id
   route_table_id = aws_route_table.public.id
 }
 
-resource "aws_route_table_association" "public_b" {
+resource "aws_route_table_association" "public_2" {
   subnet_id      = aws_subnet.TFC_PRD_sub[1].id
   route_table_id = aws_route_table.public.id
 }
