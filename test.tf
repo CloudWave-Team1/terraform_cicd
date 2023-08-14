@@ -78,15 +78,37 @@ resource "aws_launch_template" "TFC_EC2_template" {
   name_prefix   = "TFC-EC2-template"
 }
 
+# Security Group for EC2
+resource "aws_security_group" "TFC_PRD_EC2_SG" {
+  vpc_id = aws_vpc.TFC_PRD_VPC.id
+
+  ingress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["10.3.0.0/16"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "TFC-PRD-EC2-SG"
+  }
+}
+
 # Auto Scaling Group 생성
 resource "aws_autoscaling_group" "TFC_PRD_ASGP" {
-  # availability_zones = ["ap-northeast-2a", "ap-northeast-2c"]
   desired_capacity   = 1
   max_size           = 2
   min_size           = 1
   vpc_zone_identifier = [
-    aws_subnet.TFC_PRD_sub[0].id, 
-    aws_subnet.TFC_PRD_sub[1].id
+    aws_subnet.TFC_PRD_sub[2].id, # TFC-PRD-sub-pri-01
+    aws_subnet.TFC_PRD_sub[3].id  # TFC-PRD-sub-pri-02
   ]
 
   launch_template {
@@ -154,12 +176,37 @@ resource "aws_lb_listener" "front_end" {
 resource "aws_autoscaling_policy" "TFC_PRD_ASGP_TTP" {
   autoscaling_group_name = aws_autoscaling_group.TFC_PRD_ASGP.name
   name                   = "TFC-PRD-ASGP-TTP"
-  policy_type            = "TargetTrackingScaling"
+  scaling_adjustment     = 1
+  adjustment_type        = "ChangeInCapacity"
+}
 
-  target_tracking_configuration {
-    predefined_metric_specification {
-      predefined_metric_type = "ASGAverageCPUUtilization"
-    }
-    target_value = 50.0
+# Private Route Table 생성 및 연결
+resource "aws_route_table" "TFC_PRD_private_rt" {
+  vpc_id = aws_vpc.TFC_PRD_VPC.id
+
+  tags = {
+    Name = "TFC-PRD-Private-RT"
   }
+}
+
+resource "aws_route" "private_nat_route_1" {
+  route_table_id         = aws_route_table.TFC_PRD_private_rt.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.TFC_PRD_NG[0].id
+}
+
+resource "aws_route" "private_nat_route_2" {
+  route_table_id         = aws_route_table.TFC_PRD_private_rt.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.TFC_PRD_NG[1].id
+}
+
+resource "aws_route_table_association" "private_a" {
+  subnet_id      = aws_subnet.TFC_PRD_sub[2].id  # TFC-PRD-sub-pri-01
+  route_table_id = aws_route_table.TFC_PRD_private_rt.id
+}
+
+resource "aws_route_table_association" "private_c" {
+  subnet_id      = aws_subnet.TFC_PRD_sub[3].id  # TFC-PRD-sub-pri-02
+  route_table_id = aws_route_table.TFC_PRD_private_rt.id
 }
