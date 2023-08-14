@@ -67,13 +67,14 @@ resource "aws_launch_template" "TFC_EC2_template" {
   image_id      = "ami-055179a7fc9fb032d"
   instance_type = "t2.micro"
 
-  user_data = <<-EOT
+  user_data = base64encode(<<-EOT
               #!/bin/bash
               yum install -y httpd
               echo "Hello, TFC" > /var/www/html/index.html
               systemctl start httpd
               systemctl enable httpd
               EOT
+  )
 
   vpc_security_group_ids = [aws_security_group.TFC_PRD_EC2_SG.id]
 
