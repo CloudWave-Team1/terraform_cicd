@@ -1,5 +1,10 @@
 # VPC 생성
 # test
+
+provider "aws" {
+  region = "ap-northeast-2"
+}
+
 resource "aws_vpc" "TFC_PRD_VPC" {
   cidr_block = "10.3.0.0/16"
 
