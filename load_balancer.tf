@@ -81,3 +81,7 @@ resource "aws_lb_listener" "TFC_PRD_Listener_HTTPS" {
     target_group_arn = aws_lb_target_group.TFC_PRD_TG.arn
   }
 }
+
+resource "aws_route53_zone" "primary" {
+  name = "aws.devnote.dev"
+}
