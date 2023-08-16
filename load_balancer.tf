@@ -82,6 +82,6 @@ resource "aws_lb_listener" "TFC_PRD_Listener_HTTPS" {
   }
 }
 
-resource "aws_route53_zone" "primary" {
-  name = "aws.devnote.dev"
-}
+# resource "aws_route53_zone" "primary" {
+#   name = "aws.devnote.dev"
+# }
