@@ -5,6 +5,7 @@ resource "aws_lb_target_group" "TFC_PRD_TG" {
   protocol = "HTTP"
   vpc_id   = aws_vpc.TFC_PRD_VPC.id
 
+  # 헬스 체크 설정
   health_check {
     enabled             = true
     interval            = 30
@@ -45,8 +46,6 @@ resource "aws_lb_listener" "TFC_PRD_Listener" {
   }
 }
 
-# ========================================
-
 # ACM에서 인증서 생성
 resource "aws_acm_certificate" "cert" {
   domain_name       = "www.aws.devnote.dev"
@@ -82,6 +81,18 @@ resource "aws_lb_listener" "TFC_PRD_Listener_HTTPS" {
   }
 }
 
-# resource "aws_route53_zone" "primary" {
-#   name = "aws.devnote.dev"
-# }
+resource "aws_route53_zone" "aws.devnote.dev_zone" {
+  name = "aws.devnote.dev"
+}
+
+resource "aws_route53_record" "load_balancer_alias_record" {
+  zone_id = aws_route53_zone.aws.devnote.dev_zone.zone_id
+  name    = "www.aws.devnote.dev"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.TFC_PRD_ELB.dns_name
+    zone_id                = aws_lb.TFC_PRD_ELB.zone_id
+    evaluate_target_health = false
+  }
+}
