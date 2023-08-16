@@ -68,18 +68,6 @@ resource "aws_acm_certificate_validation" "cert" {
   validation_record_fqdns = [aws_route53_record.cert_validation.fqdn]
 }
 
-# 보안 그룹 수정: HTTPS 트래픽 허용
-resource "aws_security_group" "TFC_PRD_ELB_SG" {
-  # (이전 코드에서의 나머지 설정 유지)
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 # Application Load Balancer 수정: HTTPS 리스너 추가
 resource "aws_lb_listener" "TFC_PRD_Listener_HTTPS" {
   load_balancer_arn = aws_lb.TFC_PRD_ELB.arn
