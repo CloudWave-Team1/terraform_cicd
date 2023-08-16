@@ -54,7 +54,7 @@ resource "aws_acm_certificate" "cert" {
 
 # 인증서 검증용 Route53 레코드 생성: DNS 방식으로 인증서를 검증하기 위한 레코드를 Route53에 생성합니다.
 resource "aws_route53_record" "cert_validation" {
-  zone_id = "Z018893919BTR5HUQZS4J"
+  zone_id = aws_route53_zone.aws_devnote_dev_zone.zone_id
   name    = tolist(aws_acm_certificate.cert.domain_validation_options)[0].resource_record_name
   type    = tolist(aws_acm_certificate.cert.domain_validation_options)[0].resource_record_type
   records = [tolist(aws_acm_certificate.cert.domain_validation_options)[0].resource_record_value]
