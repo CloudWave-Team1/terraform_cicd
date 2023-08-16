@@ -2,7 +2,7 @@
 resource "aws_autoscaling_group" "TFC_PRD_ASG" {
   desired_capacity     = 2
   max_size             = 6
-  min_size             = 1
+  min_size             = 2
   vpc_zone_identifier  = [aws_subnet.TFC_PRD_sub[2].id, aws_subnet.TFC_PRD_sub[3].id]
   target_group_arns    = [aws_lb_target_group.TFC_PRD_TG.arn]
   launch_template {
