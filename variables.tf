@@ -40,7 +40,7 @@ variable "ap_northeast_2c" {
 }
 
 data "template_file" "setup_script" {
-  template = base64encode(file("${path.module}/userdata.sh"))
+  template = file("${path.module}/userdata.sh.tpl")
 
   vars = {
     AWS_ACCESS_KEY_ID = var.AWS_ACCESS_KEY_ID
