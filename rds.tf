@@ -19,7 +19,7 @@ resource "aws_rds_cluster" "aws_aurora" {
   backup_retention_period = 7 # 백업 보존 기간 설정
   skip_final_snapshot     = true # 삭제 시 마지막 스냅샷 생성을 건너뜀
   database_name           = "sample" # 생성될 데이터베이스 이름을 "sample"로 설정
-  multi_az                = true # Oracle은 multi-az를 지원하지 않습니다. 이 경우에는 true로 설정합니다.
+#   multi_az                = true # Oracle은 multi-az를 지원하지 않습니다. 이 경우에는 true로 설정합니다.
 }
 
 # Aurora 클러스터 인스턴스 생성
