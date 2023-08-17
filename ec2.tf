@@ -41,7 +41,7 @@ resource "aws_iam_role_policy_attachment" "ssm_full_access" {
 
 # SSM 관리된 인스턴스 코어 정책을 IAM 역할에 연결
 resource "aws_iam_role_policy_attachment" "ssm_managed_instance_core" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonSSMManagedInstanceCore"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   role       = aws_iam_role.ec2_rds_s3_access_ssm_role.name
 }
 
