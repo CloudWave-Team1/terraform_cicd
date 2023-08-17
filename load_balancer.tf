@@ -51,35 +51,51 @@ resource "aws_lb_listener" "TFC_PRD_Listener" {
   }
 }
 
-# /Static.html을 위한 리스너 규칙 생성
-resource "aws_lb_listener_rule" "TFC_PRD_ListenerRule_StaticHTML" {
+resource "aws_lb_listener_rule" "TFC_PRD_ListenerRule_Redirect" {
   listener_arn = aws_lb_listener.TFC_PRD_Listener.arn
 
-  # /Static.html을 위한 규칙 설정
+  # 리디렉션 설정
   action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.TFC_PRD_TG.arn
+    type = "redirect"
+
+    redirect {
+      host        = "#{host}"
+      path        = "/Static.html" # 리디렉션 대상 경로 설정
+      port        = "80"
+      protocol    = "HTTP"
+      query       = "#{query}"
+      status_code = "HTTP_301" # 301 영구 리디렉션
+    }
   }
 
+  # 리디렉션 조건: 루트 경로로의 요청을 리디렉트
   condition {
     path_pattern {
-      values = ["/Static.html"]
+      values = ["/"]
     }
   }
 }
-# /Static.html을 위한 리스너 규칙 생성 (HTTPS)
-resource "aws_lb_listener_rule" "TFC_PRD_ListenerRule_StaticHTML_HTTPS" {
+resource "aws_lb_listener_rule" "TFC_PRD_ListenerRule_Redirect_HTTPS" {
   listener_arn = aws_lb_listener.TFC_PRD_Listener_HTTPS.arn
 
-  # /Static.html을 위한 규칙 설정
+  # 리디렉션 설정
   action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.TFC_PRD_TG.arn
+    type = "redirect"
+
+    redirect {
+      host        = "#{host}"
+      path        = "/Static.html" # 리디렉션 대상 경로 설정
+      port        = "443"
+      protocol    = "HTTPS"
+      query       = "#{query}"
+      status_code = "HTTP_301" # 301 영구 리디렉션
+    }
   }
 
+  # 리디렉션 조건: 루트 경로로의 요청을 리디렉트
   condition {
     path_pattern {
-      values = ["/Static.html"]
+      values = ["/"]
     }
   }
 }

@@ -13,7 +13,11 @@ yum install -y wget unzip
 amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2
 yum -y install httpd php-mbstring
 
-yum install -y aws
+export AWS_ACCESS_KEY_ID="${var.AWS_ACCESS_KEY_ID}"
+export AWS_SECRET_ACCESS_KEY="${var.AWS_SECRET_ACCESS_KEY}"
+export AWS_DEFAULT_REGION="ap-northeast-2"
+export json_data=$(aws rds describe-db-clusters --query '*[]. {Endpoint:Endpoint}')
+export ENDPOINT=$(echo "$json_data" | jq -r '.[].Endpoint')
 
 # Start and enable the web server
 systemctl enable httpd
@@ -34,8 +38,3 @@ if [ ! -f /var/www/html/aws.zip ]; then
    wget https://docs.aws.amazon.com/aws-sdk-php/v3/download/aws.zip
    unzip aws.zip
 fi
-
-
-export json_data=$(aws rds describe-db-clusters --query '*[]. {Endpoint:Endpoint}
-export ENDPOINT=$(echo "$json_data" | jq -r '.[].Endpoint')
-
