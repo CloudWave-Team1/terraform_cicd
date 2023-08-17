@@ -55,7 +55,7 @@ resource "aws_autoscaling_policy" "TFC_PRD_ASG_Policy" {
       metric_name = "RequestCount"
       namespace   = "AWS/ApplicationELB"
       statistic   = "Sum"
-      dimensions {
+      dimension {
         name  = "LoadBalancer"
         value = aws_lb.TFC_PRD_ALB.arn
       }
