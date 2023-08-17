@@ -25,7 +25,7 @@ resource "aws_autoscaling_policy" "TFC_PRD_ASG_Policy" {
 
   target_tracking_configuration {
     predefined_metric_specification {
-      predefined_metric_type = "ASGAverageCPUUtilization"
+      predefined_metric_type = "ASGAverageNetworkIn"
     }
     target_value = 50.0
   }
