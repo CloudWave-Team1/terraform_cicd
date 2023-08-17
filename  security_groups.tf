@@ -6,7 +6,7 @@ resource "aws_security_group" "TFC_PRD_EC2_SG" {
   ingress {
     from_port   = 0
     to_port     = 65535
-    protocol    = "tcp"
+    protocol    = "-1"
     cidr_blocks = [aws_vpc.TFC_PRD_VPC.cidr_block]
   }
   
@@ -14,7 +14,7 @@ resource "aws_security_group" "TFC_PRD_EC2_SG" {
   egress {
     from_port   = 0
     to_port     = 65535
-    protocol    = "tcp"
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
   
