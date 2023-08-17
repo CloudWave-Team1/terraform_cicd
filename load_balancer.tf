@@ -90,7 +90,7 @@ resource "aws_lb_listener_rule" "TFC_PRD_ListenerRule_Redirect_HTTPS" {
       host        = "#{host}"
       path        = "/Static.html"
       port        = "443"
-      protocol    = "HTTP"
+      protocol    = "HTTPS"
       query       = "#{query}"
       status_code = "HTTP_301"
     }
