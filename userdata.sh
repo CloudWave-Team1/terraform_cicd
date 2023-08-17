@@ -38,3 +38,10 @@ if [ ! -f /var/www/html/aws.zip ]; then
    wget https://docs.aws.amazon.com/aws-sdk-php/v3/download/aws.zip
    unzip aws.zip
 fi
+
+#!/bin/bash
+cd /var/www/inc
+# Fetch the endpoint value
+ENDPOINT=$(aws rds describe-db-clusters --query 'DBClusters[?DBClusterIdentifier==`aurora-cluster`].Endpoint' --output text)
+# Replace the AURORA_CLUSTER_ENDPOINT with the fetched value in dbinfo.inc
+sed -i "s|AURORA_CLUSTER_ENDPOINT|$ENDPOINT|g" dbinfo.inc
