@@ -31,7 +31,7 @@
 
 **6. 보안 그룹 설정**
 - EC2 보안 그룹: TFC_PRD_EC2_SG
-- ALB 보안 그룹: TFC_PRD_ELB_SG
+- ALB 보안 그룹: TFC_PRD_ALB_SG
 
 **7. Application Load Balancer(ALB) 설정**
 - 내부 ALB: 아님

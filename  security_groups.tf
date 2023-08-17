@@ -24,7 +24,7 @@ resource "aws_security_group" "TFC_PRD_EC2_SG" {
 }
 
 # Application Load Balancer 보안 그룹 생성
-resource "aws_security_group" "TFC_PRD_ELB_SG" {
+resource "aws_security_group" "TFC_PRD_ALB_SG" {
   vpc_id = aws_vpc.TFC_PRD_VPC.id
 
   # 모든 소스에서 80, 8089, 443 포트로의 TCP 트래픽을 허용
@@ -58,7 +58,7 @@ resource "aws_security_group" "TFC_PRD_ELB_SG" {
   }
   
   tags = {
-    Name = "TFC-PRD-ELB-SG"
+    Name = "TFC-PRD-ALB-SG"
   }
 }
 
@@ -71,7 +71,7 @@ resource "aws_security_group" "TFC_PRD_RDS_SG" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    security_groups = [aws_security_group.TFC_PRD_ELB_SG.id]
+    security_groups = [aws_security_group.TFC_PRD_ALB_SG.id]
   }
 
   ingress {

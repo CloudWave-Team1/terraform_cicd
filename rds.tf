@@ -19,6 +19,9 @@ resource "aws_rds_cluster" "aws_aurora" {
   backup_retention_period = 7 # 백업 보존 기간 설정
   skip_final_snapshot     = true # 삭제 시 마지막 스냅샷 생성을 건너뜀
   database_name           = "sample" # 생성될 데이터베이스 이름을 "sample"로 설정
+
+  # Aurora 클러스터에 보안 그룹 연결
+  vpc_security_group_ids = [aws_security_group.TFC_PRD_RDS_SG.id]
 }
 
 # Aurora 클러스터 인스턴스 생성
@@ -28,6 +31,9 @@ resource "aws_rds_cluster_instance" "aws_aurora_instance" {
   cluster_identifier = aws_rds_cluster.aws_aurora.cluster_identifier # Aurora 클러스터를 참조
   instance_class     = "db.r5.large" # RDS 인스턴스 유형을 db.r5.large로 설정
   engine             = "aurora-mysql" # 엔진을 Aurora MySQL로 설정
+
+  # Aurora 클러스터 인스턴스에 보안 그룹 연결
+  vpc_security_group_ids = [aws_security_group.TFC_PRD_RDS_SG.id]
 }
 
 # RDS 인스턴스 정보를 파일로 저장 (비활성화됨)

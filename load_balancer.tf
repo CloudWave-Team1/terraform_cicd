@@ -27,21 +27,21 @@ resource "aws_lb_target_group" "TFC_PRD_TG" {
 }
 
 # 웹 트래픽을 분산할 애플리케이션 로드 밸런서 생성
-resource "aws_lb" "TFC_PRD_ELB" {
+resource "aws_lb" "TFC_PRD_ALB" {
   internal           = false
   load_balancer_type = "application"
-  name               = "TFC-PRD-ELB"
-  security_groups    = [aws_security_group.TFC_PRD_ELB_SG.id]
+  name               = "TFC_PRD_ALB"
+  security_groups    = [aws_security_group.TFC_PRD_ALB_SG.id]
   subnets            = [aws_subnet.TFC_PRD_sub[0].id, aws_subnet.TFC_PRD_sub[1].id]
   enable_deletion_protection = false
   tags = {
-    Name = "TFC-PRD-ELB"
+    Name = "TFC_PRD_ALB"
   }
 }
 
 # 생성된 ELB에 리스너 추가하고 대상 그룹 연결
 resource "aws_lb_listener" "TFC_PRD_Listener" {
-  load_balancer_arn = aws_lb.TFC_PRD_ELB.arn
+  load_balancer_arn = aws_lb.TFC_PRD_ALB.arn
   port              = 80
   protocol          = "HTTP"
 
@@ -123,7 +123,7 @@ resource "aws_acm_certificate_validation" "cert" {
 
 # Application Load Balancer 수정: HTTPS 리스너 추가
 resource "aws_lb_listener" "TFC_PRD_Listener_HTTPS" {
-  load_balancer_arn = aws_lb.TFC_PRD_ELB.arn
+  load_balancer_arn = aws_lb.TFC_PRD_ALB.arn
   port              = 443
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08" # 보안 정책 설정
@@ -142,8 +142,8 @@ resource "aws_route53_record" "load_balancer_alias_record" {
   type    = "A"
 
   alias {
-    name                   = aws_lb.TFC_PRD_ELB.dns_name
-    zone_id                = aws_lb.TFC_PRD_ELB.zone_id
+    name                   = aws_lb.TFC_PRD_ALB.dns_name
+    zone_id                = aws_lb.TFC_PRD_ALB.zone_id
     evaluate_target_health = false
   }
 }
