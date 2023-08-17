@@ -30,12 +30,12 @@ resource "aws_lb_target_group" "TFC_PRD_TG" {
 resource "aws_lb" "TFC_PRD_ALB" {
   internal           = false
   load_balancer_type = "application"
-  name               = "TFC_PRD_ALB"
+  name               = "TFC-PRD-ALB"
   security_groups    = [aws_security_group.TFC_PRD_ALB_SG.id]
   subnets            = [aws_subnet.TFC_PRD_sub[0].id, aws_subnet.TFC_PRD_sub[1].id]
   enable_deletion_protection = false
   tags = {
-    Name = "TFC_PRD_ALB"
+    Name = "TFC-PRD-ALB"
   }
 }
 
@@ -143,7 +143,7 @@ resource "aws_route53_record" "load_balancer_alias_record" {
 
   alias {
     name                   = aws_lb.TFC_PRD_ALB.dns_name
-    zone_id                = aws_lb.TFC_PRD_ALB.zone_id
+    zone_id                = aws_lb.TFC_PRD_ELB.zone_id
     evaluate_target_health = false
   }
 }
