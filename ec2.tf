@@ -57,7 +57,7 @@ resource "aws_launch_template" "TFC_EC2_template" {
   image_id      = "ami-06357c915c22d9ed6"
   instance_type = "t2.micro"
   name_prefix   = "TFC-EC2-template"
-  user_data = base64encode(data.template_file.setup_script.rendered)
+  user_data = base64encode(data.template_file.setup_script.rendered) # 템플릿에서 렌더링된 스크립트를 사용자 데이터로 제공합니다.
 
   vpc_security_group_ids = [aws_security_group.TFC_PRD_EC2_SG.id]
 
