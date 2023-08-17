@@ -17,7 +17,7 @@ export AWS_ACCESS_KEY_ID="${var.AWS_ACCESS_KEY_ID}"
 export AWS_SECRET_ACCESS_KEY="${var.AWS_SECRET_ACCESS_KEY}"
 export AWS_DEFAULT_REGION="ap-northeast-2"
 export json_data=$(aws rds describe-db-clusters --query '*[]. {Endpoint:Endpoint}')
-export ENDPOINT=$(echo "$json_data" | jq -r '.[].Endpoint')
+export AURORA_CLUSTER_ENDPOINT=$(echo "$json_data" | jq -r '.[].Endpoint')
 
 # Start and enable the web server
 systemctl enable httpd
