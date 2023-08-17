@@ -20,8 +20,8 @@ resource "aws_db_instance" "aws_rds" {
   password             = var.AWS_RDS_PASSWORD # 마스터 비밀번호를 변수에서 가져옴
   parameter_group_name = "default.mysql5.7" # 파라미터 그룹을 default.mysql5.7로 설정
   skip_final_snapshot  = true # RDS 인스턴스 삭제 시 마지막 스냅샷 생성을 건너뜀
-  db_subnet_group_name  = aws_db_subnet_group.my_subnet_group.name # 서브넷 그룹을 설정
-  multi_az              = true # Custom for Oracle does not support multi-az
+  db_subnet_group_name = aws_db_subnet_group.my_subnet_group.name # 서브넷 그룹을 설정
+  multi_az             = true # Oracle은 multi-az를 지원하지 않습니다. 이 경우에는 true로 설정합니다.
 }
 
 # RDS 인스턴스 정보를 파일로 저장 (비활성화됨)

@@ -1,3 +1,8 @@
+# Route53에 존 생성
+resource "aws_route53_zone" "aws_devnote_dev_zone" {
+  name = "aws.devnote.dev"
+}
+
 # Target Group 생성: ELB에서 트래픽을 전달할 대상 그룹을 설정합니다.
 resource "aws_lb_target_group" "TFC_PRD_TG" {
   name     = "TFC-PRD-TG"
@@ -10,7 +15,7 @@ resource "aws_lb_target_group" "TFC_PRD_TG" {
     enabled             = true
     interval            = 30
     path                = "/Static.html"
-    port                = "80"
+    port                = 80
     timeout             = 5
     healthy_threshold   = 3
     unhealthy_threshold = 3
@@ -37,7 +42,7 @@ resource "aws_lb" "TFC_PRD_ELB" {
 # ALB 리스너에서 대상 그룹을 default action으로 설정: 생성된 ELB에 리스너를 추가하고 대상 그룹을 연결합니다.
 resource "aws_lb_listener" "TFC_PRD_Listener" {
   load_balancer_arn = aws_lb.TFC_PRD_ELB.arn
-  port              = "80"
+  port              = 80
   protocol          = "HTTP"
 
   default_action {
@@ -79,11 +84,6 @@ resource "aws_lb_listener" "TFC_PRD_Listener_HTTPS" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.TFC_PRD_TG.arn
   }
-}
-
-# Route53에 존 생성
-resource "aws_route53_zone" "aws_devnote_dev_zone" {
-  name = "aws.devnote.dev"
 }
 
 # ELB에 대한 A 레코드 생성
