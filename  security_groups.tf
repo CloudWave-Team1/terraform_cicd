@@ -5,7 +5,7 @@ resource "aws_security_group" "TFC_PRD_EC2_SG" {
   # VPC 내부에서 모든 포트에 대한 TCP 트래픽을 허용
   ingress {
     from_port   = 0
-    to_port     = 65535
+    to_port     = 0
     protocol    = "-1"
     cidr_blocks = [aws_vpc.TFC_PRD_VPC.cidr_block]
   }
@@ -13,7 +13,7 @@ resource "aws_security_group" "TFC_PRD_EC2_SG" {
   # 모든 대상에 대해 모든 포트로의 나가는 트래픽을 허용
   egress {
     from_port   = 0
-    to_port     = 65535
+    to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
