@@ -60,7 +60,7 @@ resource "aws_launch_template" "TFC_EC2_template" {
   user_data = <<-EOF
               #!/bin/bash
               ${data.template_file.setup_script.rendered}
-              $(base64decode(filebase64("./codedeploy_agent.sh")))
+              $(base64decode(filebase64("./userdata.sh")))
               EOF
 
   vpc_security_group_ids = [aws_security_group.TFC_PRD_EC2_SG.id]
