@@ -39,7 +39,6 @@ if [ ! -f /var/www/html/aws.zip ]; then
    unzip aws.zip
 fi
 
-#!/bin/bash
 cd /var/www/inc
 # Save the endpoint value to the ENDPOINT file
 aws rds describe-db-clusters --query 'DBClusters[?DBClusterIdentifier==`aurora-cluster`].Endpoint' --output text > ENDPOINT
