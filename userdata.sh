@@ -32,3 +32,7 @@ if [ ! -f /var/www/html/aws.zip ]; then
    wget https://docs.aws.amazon.com/aws-sdk-php/v3/download/aws.zip
    unzip aws.zip
 fi
+
+
+export json_data=$(aws rds describe-db-clusters --query '*[]. {Endpoint:Endpoint}
+export ENDPOINT=$(echo "$json_data" | jq -r '.[].Endpoint')
