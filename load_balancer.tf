@@ -9,7 +9,7 @@ resource "aws_lb_target_group" "TFC_PRD_TG" {
   health_check {
     enabled             = true
     interval            = 30
-    path                = "/"
+    path                = "/Static.html"
     port                = "80"
     timeout             = 5
     healthy_threshold   = 3

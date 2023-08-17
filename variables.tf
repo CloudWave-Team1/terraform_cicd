@@ -24,17 +24,17 @@ variable "AWS_RDS_PASSWORD" {
 variable "aws_region" {
   description = "AWS 리전 지정"
   type        = string
-  default     = "ap-southeast-1" # 기본 리전을 설정합니다.
+  default     = "ap-northeast-2" # 기본 리전을 설정합니다.
 }
 
 # 가용 영역 변수를 정의합니다. 가용 영역은 AWS 리전 내의 데이터 센터입니다.
 variable "ap_northeast_2a" {
   description = "AWS 가용 영역 지정"
   type        = string
-  default     = "ap-southeast-1a" # 기본 가용 영역을 설정합니다.
+  default     = "ap-northeast-2a" # 기본 가용 영역을 설정합니다.
 }
 variable "ap_northeast_2c" {
   description = "AWS 가용 영역 지정"
   type        = string
-  default     = "ap-southeast-1c" # 기본 가용 영역을 설정합니다.
+  default     = "ap-northeast-2c" # 기본 가용 영역을 설정합니다.
 }
