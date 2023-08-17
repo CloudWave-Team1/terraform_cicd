@@ -57,10 +57,7 @@ resource "aws_launch_template" "TFC_EC2_template" {
   image_id              = "ami-0d3120170251f6a8f"
   instance_type         = "t2.micro"
   name_prefix           = "TFC-EC2-template"
-  user_data             = base64encode(templatefile("${path.module}/userdata.sh.tpl", {
-    aws_access_key_id     = var.AWS_ACCESS_KEY_ID,
-    aws_secret_access_key = var.AWS_SECRET_ACCESS_KEY
-  }))
+  user_data             = base64encode(data.template_file.setup_script.rendered)
   vpc_security_group_ids = [aws_security_group.TFC_PRD_EC2_SG.id]
 
   # 생성한 IAM 인스턴스 프로필을 EC2 인스턴스에 연결
