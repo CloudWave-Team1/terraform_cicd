@@ -31,16 +31,36 @@ resource "aws_autoscaling_group" "TFC_PRD_ASG" {
 #   }
 # }
 
-# Target Tracking Scaling Policy
+# # Target Tracking Scaling Policy
+# resource "aws_autoscaling_policy" "TFC_PRD_ASG_Policy" {
+#   name                   = "TFC-PRD-ASG-Policy"
+#   autoscaling_group_name = aws_autoscaling_group.TFC_PRD_ASG.name
+#   policy_type            = "TargetTrackingScaling"
+
+#   target_tracking_configuration {
+#     predefined_metric_specification {
+#       predefined_metric_type = "ASGAverageCPUUtilization"
+#     }
+#     target_value = 50.0
+#   }
+# }
+
 resource "aws_autoscaling_policy" "TFC_PRD_ASG_Policy" {
   name                   = "TFC-PRD-ASG-Policy"
   autoscaling_group_name = aws_autoscaling_group.TFC_PRD_ASG.name
   policy_type            = "TargetTrackingScaling"
 
   target_tracking_configuration {
-    predefined_metric_specification {
-      predefined_metric_type = "ASGAverageCPUUtilization"
+    customized_metric_specification {
+      metric_name = "RequestCount"
+      namespace   = "AWS/ApplicationELB"
+      statistic   = "Sum"
+      dimensions {
+        name  = "LoadBalancer"
+        value = aws_lb.TFC_PRD_ALB.arn # 이 부분을 자신의 로드 밸런서 ARN으로 변경하세요
+      }
+      unit = "Count"
     }
-    target_value = 50.0
+    target_value = 1000.0 # ALB 요청 수 목표값
   }
 }
