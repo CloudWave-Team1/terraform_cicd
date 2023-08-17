@@ -89,6 +89,7 @@ resource "aws_acm_certificate" "cert" {
   subject_alternative_names = [
     aws_lb.TFC_PRD_ALB.dns_name
   ]
+  depends_on = [aws_lb.TFC_PRD_ALB]
 }
 
 // 인증서의 DNS 검증 레코드를 생성합니다.
