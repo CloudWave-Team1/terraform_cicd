@@ -85,12 +85,6 @@ resource "aws_lb_listener_rule" "TFC_PRD_ListenerRule_Redirect_HTTPS" {
 resource "aws_acm_certificate" "cert" {
   domain_name       = "cj.aws.devnote.dev"
   validation_method = "DNS"
-
-  depends_on = [aws_lb.TFC_PRD_ALB]
-
-  subject_alternative_names = [
-    aws_lb.TFC_PRD_ALB.dns_name
-  ]
 }
 
 // 인증서의 DNS 검증 레코드를 생성합니다.
