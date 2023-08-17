@@ -52,15 +52,15 @@ resource "aws_autoscaling_policy" "TFC_PRD_ASG_Policy" {
 
   target_tracking_configuration {
     customized_metric_specification {
-      metric_name = "RequestCount"
+      metric_name = "RequestCountPerTarget"
       namespace   = "AWS/ApplicationELB"
-      statistic   = "Sum"
-      dimension {
-        name  = "LoadBalancer"
-        value = aws_lb.TFC_PRD_ALB.arn
+      statistic   = "Average"
+      dimensions {
+        name  = "TargetGroup"
+        value = aws_lb_target_group.TFC_PRD_TG.arn
       }
       unit = "Count"
     }
-    target_value = 1000.0
+    target_value = 1000.0 # 이 값을 원하는 대상당 요청 수로 변경하세요
   }
 }
