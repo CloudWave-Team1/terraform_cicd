@@ -54,7 +54,7 @@ resource "aws_iam_instance_profile" "ec2_rds_s3_access_ssm_profile" {
 # EC2 인스턴스 생성을 위한 템플릿
 resource "aws_launch_template" "TFC_EC2_template" {
   description   = "TFC EC2 basic start"
-  image_id      = "ami-0874c8448b9f4e4ea"
+  image_id      = "ami-06c3a85dbaf5437a3"
   instance_type = "t2.micro"
   name_prefix   = "TFC-EC2-template"
   user_data = base64encode(file("./codedeploy_agent.sh")) # 테스트 용
