@@ -71,14 +71,14 @@ resource "aws_security_group" "TFC_PRD_RDS_SG" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    security_groups = [aws_security_group.TFC_PRD_ELB_SG.name]
+    security_groups = [aws_security_group.TFC_PRD_ELB_SG.id]
   }
 
   ingress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    security_groups = [aws_security_group.TFC_PRD_EC2_SG.name]
+    security_groups = [aws_security_group.TFC_PRD_EC2_SG.id]
   }
 
   # 모든 대상에 대해 모든 포트로의 나가는 트래픽을 허용
