@@ -102,7 +102,7 @@ resource "aws_lb_listener_rule" "TFC_PRD_ListenerRule_Redirect_HTTPS" {
 
 # HTTPS 연결을 위한 SSL/TLS 인증서 생성
 resource "aws_acm_certificate" "cert" {
-  domain_name       = "aws.devnote.dev"
+  domain_name       = "cj.aws.devnote.dev"
   validation_method = "DNS"
 }
 
