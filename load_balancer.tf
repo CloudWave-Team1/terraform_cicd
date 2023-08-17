@@ -67,6 +67,22 @@ resource "aws_lb_listener_rule" "TFC_PRD_ListenerRule_StaticHTML" {
     }
   }
 }
+# /Static.html을 위한 리스너 규칙 생성 (HTTPS)
+resource "aws_lb_listener_rule" "TFC_PRD_ListenerRule_StaticHTML_HTTPS" {
+  listener_arn = aws_lb_listener.TFC_PRD_Listener_HTTPS.arn
+
+  # /Static.html을 위한 규칙 설정
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.TFC_PRD_TG.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/Static.html"]
+    }
+  }
+}
 
 # HTTPS 연결을 위한 SSL/TLS 인증서 생성
 resource "aws_acm_certificate" "cert" {
