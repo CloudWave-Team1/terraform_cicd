@@ -143,7 +143,7 @@ resource "aws_route53_record" "load_balancer_alias_record" {
 
   alias {
     name                   = aws_lb.TFC_PRD_ALB.dns_name
-    zone_id                = aws_lb.TFC_PRD_ELB.zone_id
+    zone_id                = aws_lb.TFC_PRD_ALB.zone_id
     evaluate_target_health = false
   }
 }
