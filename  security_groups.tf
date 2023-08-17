@@ -69,23 +69,23 @@ resource "aws_security_group" "TFC_PRD_RDS_SG" {
   # TFC-PRD-ELB-SG 및 TFC-PRD-EC2-SG 보안 그룹에서 모든 포트와 프로토콜의 트래픽을 허용
   ingress {
     from_port   = 0
-    to_port     = 65535
-    protocol    = "all"
+    to_port     = 0
+    protocol    = "-1"
     security_groups = [aws_security_group.TFC_PRD_ELB_SG.name]
   }
 
   ingress {
     from_port   = 0
-    to_port     = 65535
-    protocol    = "all"
+    to_port     = 0
+    protocol    = "-1"
     security_groups = [aws_security_group.TFC_PRD_EC2_SG.name]
   }
 
   # 모든 대상에 대해 모든 포트로의 나가는 트래픽을 허용
   egress {
     from_port   = 0
-    to_port     = 65535
-    protocol    = "all"
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
   
