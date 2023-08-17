@@ -53,10 +53,10 @@ resource "aws_iam_instance_profile" "ec2_rds_s3_access_ssm_profile" {
 
 # EC2 인스턴스 생성을 위한 템플릿
 resource "aws_launch_template" "TFC_EC2_template" {
-  description           = "TFC EC2 basic start"
+  description           = "TFC-EC2-basic-start-template"
   image_id              = "ami-0d3120170251f6a8f"
   instance_type         = "t2.micro"
-  name_prefix           = "TFC-EC2-template"
+  name_prefix           = "TFC-EC2-basic-start-template"
   user_data             = base64encode(data.template_file.setup_script.rendered)
   vpc_security_group_ids = [aws_security_group.TFC_PRD_EC2_SG.id]
 
