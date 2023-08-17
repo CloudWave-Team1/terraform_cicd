@@ -97,7 +97,7 @@ resource "aws_lb_listener_rule" "TFC_PRD_ListenerRule_Redirect_HTTP_to_HTTPS" {
 
   // 모든 요청을 리디렉션 대상으로 설정합니다.
   condition {
-    host_header {
+    path_pattern {
       values = ["/"]
     }
   }
