@@ -57,7 +57,11 @@ resource "aws_launch_template" "TFC_EC2_template" {
   image_id      = "ami-06357c915c22d9ed6"
   instance_type = "t2.micro"
   name_prefix   = "TFC-EC2-template"
-  user_data = base64encode(file("./codedeploy_agent.sh")) # 테스트 용
+  user_data = <<-EOF
+              #!/bin/bash
+              ${data.template_file.setup_script.rendered}
+              $(base64decode(filebase64("./codedeploy_agent.sh")))
+              EOF
 
   vpc_security_group_ids = [aws_security_group.TFC_PRD_EC2_SG.id]
 
