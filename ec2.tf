@@ -57,7 +57,7 @@ resource "aws_launch_template" "TFC_EC2_template" {
   image_id              = "ami-0d3120170251f6a8f"
   instance_type         = "t2.micro"
   name_prefix           = "TFC-EC2-template"
-  user_data             = base64encode(templatefile("${path.module}/user_data.tpl", {
+  user_data             = base64encode(templatefile("${path.module}/user_data.sh.tpl", {
     aws_access_key_id     = var.AWS_ACCESS_KEY_ID,
     aws_secret_access_key = var.AWS_SECRET_ACCESS_KEY
   }))
