@@ -55,12 +55,12 @@ resource "aws_autoscaling_policy" "TFC_PRD_ASG_Policy" {
       metric_name = "RequestCountPerTarget"
       namespace   = "AWS/ApplicationELB"
       statistic   = "Average"
-      dimensions {
-        name  = "TargetGroup"
-        value = aws_lb_target_group.TFC_PRD_TG.arn
-      }
       unit = "Count"
     }
     target_value = 1000.0 # 이 값을 원하는 대상당 요청 수로 변경하세요
   }
+  dimensions {
+    name  = "TargetGroup"
+    value = aws_lb_target_group.TFC_PRD_TG.arn
+    }
 }
