@@ -96,11 +96,11 @@ resource "aws_lb_listener_rule" "TFC_PRD_ListenerRule_Redirect_HTTP_to_HTTPS" {
   }
 
   // 모든 요청을 리디렉션 대상으로 설정합니다.
-  condition {
-    host_header {
-      values = ["*"]
-    }
-  }
+#   condition {
+#     host_header {
+#       values = [""]
+#     }
+#   }
 }
 
 // cj.aws.devnote.dev 도메인의 ACM 인증서를 생성합니다.
