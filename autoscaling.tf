@@ -57,10 +57,10 @@ resource "aws_autoscaling_policy" "TFC_PRD_ASG_Policy" {
       statistic   = "Sum"
       dimensions {
         name  = "LoadBalancer"
-        value = aws_lb.TFC_PRD_ALB.arn # 이 부분을 자신의 로드 밸런서 ARN으로 변경하세요
+        value = aws_lb.TFC_PRD_ALB.arn
       }
       unit = "Count"
     }
-    target_value = 1000.0 # ALB 요청 수 목표값
+    target_value = 1000.0
   }
 }
