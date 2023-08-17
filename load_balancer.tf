@@ -103,11 +103,17 @@ resource "aws_lb_listener_rule" "TFC_PRD_ListenerRule_Redirect_HTTP_to_HTTPS" {
   }
 }
 
-// cj.aws.devnote.dev 도메인의 ACM 인증서를 생성합니다.
 resource "aws_acm_certificate" "cert" {
   domain_name       = "cj.aws.devnote.dev"
   validation_method = "DNS"
+
+  subject_alternative_names = [
+    aws_lb.TFC_PRD_ALB.dns_name
+  ]
+
+  depends_on = [aws_lb.TFC_PRD_ALB]
 }
+
 
 // 인증서의 DNS 검증 레코드를 생성합니다.
 resource "aws_route53_record" "cert_validation" {
