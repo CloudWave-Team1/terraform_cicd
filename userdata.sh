@@ -13,6 +13,8 @@ yum install -y wget unzip
 amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2
 yum -y install httpd php-mbstring
 
+yum install -y aws
+
 # Start and enable the web server
 systemctl enable httpd
 systemctl start httpd
@@ -36,3 +38,4 @@ fi
 
 export json_data=$(aws rds describe-db-clusters --query '*[]. {Endpoint:Endpoint}
 export ENDPOINT=$(echo "$json_data" | jq -r '.[].Endpoint')
+

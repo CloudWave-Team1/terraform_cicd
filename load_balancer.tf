@@ -1,16 +1,16 @@
-# Route53에 존 생성
+# Route53에서 존 생성
 resource "aws_route53_zone" "aws_devnote_dev_zone" {
   name = "aws.devnote.dev"
 }
 
-# Target Group 생성: ELB에서 트래픽을 전달할 대상 그룹을 설정합니다.
+# ELB에서 트래픽을 전달할 대상 그룹 생성
 resource "aws_lb_target_group" "TFC_PRD_TG" {
   name     = "TFC-PRD-TG"
   port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.TFC_PRD_VPC.id
 
-  # 헬스 체크 설정: 대상 그룹에 대한 헬스 체크 설정을 합니다.
+  # 대상 그룹의 헬스 체크 설정
   health_check {
     enabled             = true
     interval            = 30
@@ -26,7 +26,7 @@ resource "aws_lb_target_group" "TFC_PRD_TG" {
   }
 }
 
-# Application Load Balancer 생성: 웹 트래픽을 분산시킬 ELB를 생성합니다.
+# 웹 트래픽을 분산할 애플리케이션 로드 밸런서 생성
 resource "aws_lb" "TFC_PRD_ELB" {
   internal           = false
   load_balancer_type = "application"
@@ -39,7 +39,7 @@ resource "aws_lb" "TFC_PRD_ELB" {
   }
 }
 
-# ALB 리스너에서 대상 그룹을 default action으로 설정: 생성된 ELB에 리스너를 추가하고 대상 그룹을 연결합니다.
+# 생성된 ELB에 리스너 추가하고 대상 그룹 연결
 resource "aws_lb_listener" "TFC_PRD_Listener" {
   load_balancer_arn = aws_lb.TFC_PRD_ELB.arn
   port              = 80
@@ -51,13 +51,30 @@ resource "aws_lb_listener" "TFC_PRD_Listener" {
   }
 }
 
-# ACM에서 인증서 생성: HTTPS 연결을 위한 SSL/TLS 인증서를 생성합니다.
+# /Static.html을 위한 리스너 규칙 생성
+resource "aws_lb_listener_rule" "TFC_PRD_ListenerRule_StaticHTML" {
+  listener_arn = aws_lb_listener.TFC_PRD_Listener.arn
+
+  # /Static.html을 위한 규칙 설정
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.TFC_PRD_TG.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/Static.html"]
+    }
+  }
+}
+
+# HTTPS 연결을 위한 SSL/TLS 인증서 생성
 resource "aws_acm_certificate" "cert" {
   domain_name       = "www.aws.devnote.dev"
   validation_method = "DNS"
 }
 
-# 인증서 검증용 Route53 레코드 생성: DNS 방식으로 인증서를 검증하기 위한 레코드를 Route53에 생성합니다.
+# DNS 방식으로 인증서 검증을 위한 Route53 레코드 생성
 resource "aws_route53_record" "cert_validation" {
   zone_id = aws_route53_zone.aws_devnote_dev_zone.zone_id
   name    = tolist(aws_acm_certificate.cert.domain_validation_options)[0].resource_record_name
@@ -66,7 +83,7 @@ resource "aws_route53_record" "cert_validation" {
   ttl     = 60
 }
 
-# 인증서 검증: Route53 레코드를 이용하여 인증서를 검증합니다.
+# Route53 레코드를 이용하여 인증서 검증
 resource "aws_acm_certificate_validation" "cert" {
   certificate_arn         = aws_acm_certificate.cert.arn
   validation_record_fqdns = [aws_route53_record.cert_validation.fqdn]
