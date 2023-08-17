@@ -40,7 +40,7 @@ variable "ap_northeast_2c" {
 }
 
 data "template_file" "setup_script" {
-  template = file("${path.module}/setup.sh.tpl")
+  template = file("${path.module}/userdata.sh")
   vars = {
     access_key = var.AWS_ACCESS_KEY_ID
     secret_key = var.AWS_SECRET_ACCESS_KEY
