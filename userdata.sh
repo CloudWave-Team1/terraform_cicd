@@ -13,8 +13,8 @@ yum install -y wget unzip
 amazon-linux-extras install -y lamp-mariadb10.2-php7.2 php7.2
 yum -y install httpd php-mbstring
 
-export AWS_ACCESS_KEY_ID="${var.AWS_ACCESS_KEY_ID}"
-export AWS_SECRET_ACCESS_KEY="${var.AWS_SECRET_ACCESS_KEY}"
+export AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}"
+export AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}"
 export AWS_DEFAULT_REGION="ap-northeast-2"
 export json_data=$(aws rds describe-db-clusters --query '*[]. {Endpoint:Endpoint}')
 export AURORA_CLUSTER_ENDPOINT=$(echo "$json_data" | jq -r '.[].Endpoint')
