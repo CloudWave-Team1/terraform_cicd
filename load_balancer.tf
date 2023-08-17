@@ -40,7 +40,7 @@ resource "aws_lb" "TFC_PRD_ALB" {
 }
 
 # 생성된 ELB에 리스너 추가하고 대상 그룹 연결
-resource "aws_lb_listener" "TFC_PRD_Listener" {
+resource "aws_lb_listener" "TFC_PRD_Listener_HTTP" {
   load_balancer_arn = aws_lb.TFC_PRD_ALB.arn
   port              = 80
   protocol          = "HTTP"
@@ -51,8 +51,8 @@ resource "aws_lb_listener" "TFC_PRD_Listener" {
   }
 }
 
-resource "aws_lb_listener_rule" "TFC_PRD_ListenerRule_Redirect" {
-  listener_arn = aws_lb_listener.TFC_PRD_Listener.arn
+resource "aws_lb_listener_rule" "TFC_PRD_ListenerRule_Redirect_HTTP" {
+  listener_arn = aws_lb_listener.TFC_PRD_Listener_HTTP.arn
 
   # 리디렉션 설정
   action {
