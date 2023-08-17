@@ -102,7 +102,7 @@ resource "aws_lb_listener_rule" "TFC_PRD_ListenerRule_Redirect_HTTPS" {
 
 # HTTPS 연결을 위한 SSL/TLS 인증서 생성
 resource "aws_acm_certificate" "cert" {
-  domain_name       = "www.aws.devnote.dev"
+  domain_name       = "aws.devnote.dev"
   validation_method = "DNS"
 }
 
@@ -138,7 +138,7 @@ resource "aws_lb_listener" "TFC_PRD_Listener_HTTPS" {
 # ELB에 대한 A 레코드 생성
 resource "aws_route53_record" "load_balancer_alias_record" {
   zone_id = aws_route53_zone.aws_devnote_dev_zone.zone_id
-  name    = "www.aws.devnote.dev"
+  name    = "aws.devnote.dev"
   type    = "A"
 
   alias {
