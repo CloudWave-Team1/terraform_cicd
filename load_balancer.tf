@@ -138,7 +138,7 @@ resource "aws_lb_listener" "TFC_PRD_Listener_HTTPS" {
 # ELB에 대한 A 레코드 생성
 resource "aws_route53_record" "load_balancer_alias_record" {
   zone_id = aws_route53_zone.aws_devnote_dev_zone.zone_id
-  name    = "aws.devnote.dev"
+  name    = "cj.aws.devnote.dev"
   type    = "A"
 
   alias {
