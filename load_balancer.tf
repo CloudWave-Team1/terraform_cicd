@@ -55,7 +55,7 @@ resource "aws_lb_listener" "TFC_PRD_Listener_HTTP" {
   }
 }
 
-// HTTP 리스너의 리디렉션 규칙을 생성합니다.
+// HTTPS 리스너의 리디렉션 규칙을 생성합니다.
 resource "aws_lb_listener_rule" "TFC_PRD_ListenerRule_Redirect_HTTPS" {
   listener_arn = aws_lb_listener.TFC_PRD_Listener_HTTPS.arn
 
@@ -77,6 +77,28 @@ resource "aws_lb_listener_rule" "TFC_PRD_ListenerRule_Redirect_HTTPS" {
   condition {
     path_pattern {
       values = ["/"]
+    }
+  }
+}
+# HTTP 리스너의 리디렉션 규칙을 생성합니다.
+resource "aws_lb_listener_rule" "TFC_PRD_ListenerRule_Redirect_HTTP_to_HTTPS" {
+  listener_arn = aws_lb_listener.TFC_PRD_Listener_HTTP.arn
+
+  # 리디렉션 동작을 설정합니다.
+  action {
+    type = "redirect"
+
+    redirect {
+      protocol    = "HTTPS"
+      port        = "443"
+      status_code = "HTTP_301"
+    }
+  }
+
+  // 모든 요청을 리디렉션 대상으로 설정합니다.
+  condition {
+    host_header {
+      values = ["*"]
     }
   }
 }
