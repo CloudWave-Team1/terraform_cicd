@@ -21,6 +21,7 @@ resource "aws_db_instance" "aws_rds" {
   parameter_group_name = "default.mysql5.7" # 파라미터 그룹을 default.mysql5.7로 설정
   skip_final_snapshot  = true # RDS 인스턴스 삭제 시 마지막 스냅샷 생성을 건너뜀
   db_subnet_group_name  = aws_db_subnet_group.my_subnet_group.name # 서브넷 그룹을 설정
+  multi_az              = true # Custom for Oracle does not support multi-az
 }
 
 # RDS 인스턴스 정보를 파일로 저장 (비활성화됨)
