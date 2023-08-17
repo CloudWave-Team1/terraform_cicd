@@ -41,7 +41,9 @@ fi
 
 #!/bin/bash
 cd /var/www/inc
-# Fetch the endpoint value
-ENDPOINT=$(aws rds describe-db-clusters --query 'DBClusters[?DBClusterIdentifier==`aurora-cluster`].Endpoint' --output text)
-# Replace the AURORA_CLUSTER_ENDPOINT with the fetched value in dbinfo.inc
-sed -i "s|AURORA_CLUSTER_ENDPOINT|$ENDPOINT|g" dbinfo.inc
+# Save the endpoint value to the ENDPOINT file
+aws rds describe-db-clusters --query 'DBClusters[?DBClusterIdentifier==`aurora-cluster`].Endpoint' --output text > ENDPOINT
+# Read the value from the ENDPOINT file
+VALUE=$(cat ENDPOINT)
+# Replace the AURORA_CLUSTER_ENDPOINT string with the fetched value in dbinfo.inc
+sed -i "s|AURORA_CLUSTER_ENDPOINT|$VALUE|g" dbinfo.inc
