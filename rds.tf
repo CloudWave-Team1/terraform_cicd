@@ -12,7 +12,7 @@ resource "aws_db_subnet_group" "aurora_subnet_group" {
 resource "aws_rds_cluster" "aws_aurora" {
   cluster_identifier      = "aurora-cluster" # 클러스터 식별자 설정
   engine                  = "aurora-mysql" # 엔진을 Aurora MySQL로 설정
-  engine_version          = "5.7.mysql_aurora.2.03.2" # 엔진 버전을 5.7로 설정
+  engine_version          = "5.7.mysql_aurora.2.11.2" # 엔진 버전을 5.7로 설정
   db_subnet_group_name    = aws_db_subnet_group.aurora_subnet_group.name # 서브넷 그룹을 설정
   master_username         = var.AWS_RDS_ID # 마스터 사용자 이름을 변수에서 가져옴
   master_password         = var.AWS_RDS_PASSWORD # 마스터 비밀번호를 변수에서 가져옴
