@@ -1,4 +1,4 @@
-# EC2 오토스케일링 그룹 설정
+# EC2 오토스케일링 그룹 설정.
 resource "aws_autoscaling_group" "TFC_PRD_ASG" {
   name                 = "TFC-PRD-ASG"
   desired_capacity     = 2
